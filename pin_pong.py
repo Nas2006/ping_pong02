@@ -16,13 +16,12 @@ display.set_caption("Ping Pong")
 clock = time.Clock()
 
 #label
+
 font.init()
 font1 = font.SysFont("Arial", 40)
 lose1 = font1.render("Player 1 lost!", True, (216, 41, 131))
 lose2 = font1.render("Player 2 lost!", True, (216, 41, 131))
 
-score1 = font1.render("Score: ", True, (127, 43, 250))
-score2 = font1.render("Score: ", True, (127, 43, 250))
 
 menu = font1.render("1.to play press SPACE", True, (127, 43, 250))
 menu2 = font1.render("2.To go to the store, press M", True, (127, 43, 250))
@@ -64,32 +63,58 @@ class Racket(GameSprite):
  
     def right_update(self):
         k_pressed = key.get_pressed()
-        if k_pressed[K_DOWN] and self.rect.y > 10 and self.rect.y < border_bottom:
+        if k_pressed[K_DOWN] and self.rect.y < border_bottom:
             self.rect.y += self.speed
 
-        if k_pressed[K_UP] and self.rect.y > 10:
+        if k_pressed[K_UP] and self.rect.y > 5:
             self.rect.y -= self.speed
         
     def left_update(self):
         k_pressed = key.get_pressed()
-        if k_pressed[K_s] and self.rect.y > 10 and self.rect.y < border_bottom:
+        if k_pressed[K_s] and self.rect.y < border_bottom:
             self.rect.y += self.speed
 
-        if k_pressed[K_w] and self.rect.y > 10:     #and self.rect.y < border_top
+        if k_pressed[K_w] and self.rect.y > 5:     #and self.rect.y < border_top
             self.rect.y -= self.speed
+
+
+x_speed = 5
+y_speed = 3
+
+class Ball(GameSprite):
+    def __init__(self, player_image, start_x, start_y, size, player_speed):
+        super().__init__(player_image, start_x, start_y, size, player_speed)
+
+        self.y_speed = 3
+        self.x_speed = 5
+
+    def ball_move(self):
+        if self.rect.y > border_bottom or self.rect.x < 0:
+            self.y_speed *= -1
+            self.x_speed *= -1
+
+        if self.rect.y < border_bottom or self.rect.x > 0:
+            self.y_speed *= -1
+            self.x_speed *= -1
+
+
 
 
 #characters
 racket1 = Racket(img_racket, 40, 300, ch_size, 20)
 racket2 = Racket(img_racket, 750, 300, ch_size, 20)
-ball = GameSprite(img_ball, 400, 300, ch_size, 2)
-ball02 = GameSprite(img_ball02, 400, 300, ch_size, 2)
+ball = Ball(img_ball, 400, 300, ch_size, 2)
+ball02 = Ball(img_ball02, 400, 300, ch_size, 2)
 
-x_speed = 5
-y_speed = 5
+
 
 score_l = 0
 score_r = 0
+
+score1 = font1.render("Score: " + str(score_l), True, (127, 43, 250))
+score2 = font1.render("Score: " + str(score_r), True, (127, 43, 250))
+
+
 
 run = True
 finale = False
@@ -101,7 +126,7 @@ ball_purchased = False
 while run:
     window.fill(img_background)
     window.blit(menu, (200, 300))
-    window.blit(menu2, (200, 330))
+    window.blit(menu2, (200, 340))
     for e in event.get():
         if e.type == QUIT:
             run = False
@@ -138,23 +163,35 @@ while run:
         if finale != True:
             racket1.left_update()
             racket2.right_update()
+            ball.ball_move()
 
             ball.rect.x += x_speed
             ball.rect.y += y_speed
             
 
-            if sprite.collide_rect(racket1, ball) or sprite.collide_rect(racket2, ball):
-                racket1.left_update()
-                racket2.right_update()
+            if sprite.collide_rect(racket1, ball):
                 x_speed *= -1
                 y_speed *= -1
+                score_l += 1
+                window.blit(score1, (10, 15))
+
+            if sprite.collide_rect(racket2, ball):
+                x_speed *= -1
+                y_speed *= -1
+                score_r += 1
+                window.blit(score2, (730, 15))
+
                 
 
-            if ball.rect.y > border_bottom or ball.rect.y < 0:
+            '''if ball.rect.y > border_bottom or ball.rect.y < 0:
                 y_speed *= -1
                 x_speed *= -1
 
-            if ball.rect.x < border_left:
+            if ball.rect.y < border_bottom or ball.rect.y > 0:
+                y_speed *= 1
+                x_speed *= 1'''
+
+            if ball.rect.x > border_left:
                 #finale = True
                 #window.blit(lose1, (300, 300))
                 score_r += 1
@@ -168,15 +205,12 @@ while run:
                 #run = False
 
             if score_l == 3:
-                run = False
+                #run = False
                 window.blit(lose2, (300, 300))
 
             if score_r == 3:
-                run = False
+                #run = False
                 window.blit(lose1, (300, 300))
-
-
-
 
         
     display.update()
