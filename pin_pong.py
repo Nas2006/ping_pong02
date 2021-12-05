@@ -106,6 +106,8 @@ racket2 = Racket(img_racket, 750, 300, ch_size, 20)
 ball = Ball(img_ball, 400, 300, ch_size, 2)
 ball02 = Ball(img_ball02, 400, 300, ch_size, 2)
 
+items = [ball02, img_background3, img_background, ball]
+
 
 
 score_l = 0
@@ -145,20 +147,66 @@ while run:
         if back_purchased == False and e.type == KEYDOWN:
             if e.key == K_g:
                 back_purchased = True
+                if game_run == True:
+                    background = items[1] 
+                    window.fill(background)
+            if back_purchased == False:
+                if game_run == True:
+                    background = items[2] 
+                    window.fill(background)
+
                 
         elif ball_purchased == False and e.type == KEYDOWN:
             if e.key == K_b:
                 ball_purchased = True
+                if game_run == True:
+                    game_ball = items[0] 
+                    game_ball.reset()
+            if ball_purchased == False:
+                if game_run == True:
+                    game_ball = items[3] 
+                    game_ball.reset()
 
     if game_run == True:
-        window.fill(img_background)
-        racket1.reset()
-        racket2.reset()
-        racket1.left_update()
-        racket2.right_update()
-        ball.reset()
-        window.blit(score1, (10, 15))
-        window.blit(score2, (730, 15))
+        if back_purchased == True:
+            window.fill(items[1])
+            racket1.reset()
+            racket2.reset()
+            racket1.left_update()
+            racket2.right_update()
+            ball.reset()
+            window.blit(score1, (10, 15))
+            window.blit(score2, (730, 15))
+        elif ball_purchased == True:
+            window.fill(items[2])
+            racket1.reset()
+            racket2.reset()
+            racket1.left_update()
+            racket2.right_update()
+            items[0].reset()
+            items[0].ball_move()
+            window.blit(score1, (10, 15))
+            window.blit(score2, (730, 15))
+        elif ball_purchased == True and back_purchased == True:
+            window.fill(items[1])
+            racket1.reset()
+            racket2.reset()
+            racket1.left_update()
+            racket2.right_update()
+            items[0].reset()
+            items[0].ball_move()
+            window.blit(score1, (10, 15))
+            window.blit(score2, (730, 15))
+
+        else:
+            window.fill(items[2])
+            racket1.reset()
+            racket2.reset()
+            racket1.left_update()
+            racket2.right_update()
+            (items[3]).reset()
+            window.blit(score1, (10, 15))
+            window.blit(score2, (730, 15))
 
         if finale != True:
             racket1.left_update()
